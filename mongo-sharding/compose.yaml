@@ -5,8 +5,7 @@ services:
     container_name: configSrv
     restart: always
     networks:
-      app-network:
-        ipv4_address: 173.17.0.10
+      - app-network
     volumes:
       - config-data:/data/db
     command:
@@ -32,8 +31,7 @@ services:
     depends_on:
       - configSrv
     networks:
-      app-network:
-        ipv4_address: 173.17.0.7
+      - app-network
     command:
       [
         "mongos",
@@ -53,8 +51,7 @@ services:
     container_name: shard1
     restart: always
     networks:
-      app-network:
-        ipv4_address: 173.17.0.9
+      - app-network
     volumes:
       - shard1-data:/data/db
     command:
@@ -76,8 +73,7 @@ services:
     container_name: shard2
     restart: always
     networks:
-      app-network:
-        ipv4_address: 173.17.0.8
+      - app-network
     volumes:
       - shard2-data:/data/db
     command:
@@ -96,7 +92,7 @@ services:
 
   pymongo_api:
     container_name: pymongo_api
-    build: 
+    build:
       context: api_app
       dockerfile: Dockerfile
     depends_on:
@@ -104,8 +100,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      app-network:
-        ipv4_address: 173.17.0.2
+      - app-network
     environment:
       MONGODB_URL: "mongodb://mongos_router:27017"
       MONGODB_DATABASE_NAME: "somedb"
@@ -113,13 +108,8 @@ services:
 networks:
   app-network:
     driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 173.17.0.0/16
 
 volumes:
   config-data:
   shard1-data:
   shard2-data:
-
