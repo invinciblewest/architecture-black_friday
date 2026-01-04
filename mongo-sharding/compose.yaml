@@ -4,8 +4,6 @@ services:
     image: mongo:latest
     container_name: configSrv
     restart: always
-    ports:
-      - "27017:27017"
     networks:
       app-network:
         ipv4_address: 173.17.0.10
@@ -18,10 +16,10 @@ services:
         "config_server",
         "--bind_ip_all",
         "--port",
-        "27017"
+        "27019"
       ]
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -30,7 +28,7 @@ services:
     container_name: mongos_router
     restart: always
     ports:
-      - "27020:27017"
+      - "27017:27017"
     depends_on:
       - configSrv
     networks:
@@ -40,7 +38,7 @@ services:
       [
         "mongos",
         "--configdb",
-        "config_server/configSrv:27017",
+        "config_server/configSrv:27019",
         "--bind_ip_all",
         "--port",
         "27017"
@@ -54,8 +52,6 @@ services:
     image: mongo:latest
     container_name: shard1
     restart: always
-    ports:
-      - "27018:27017"
     networks:
       app-network:
         ipv4_address: 173.17.0.9
@@ -68,10 +64,10 @@ services:
         "shard1",
         "--bind_ip_all",
         "--port",
-        "27017"
+        "27018"
       ]
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -79,8 +75,6 @@ services:
     image: mongo:latest
     container_name: shard2
     restart: always
-    ports:
-      - "27019:27017"
     networks:
       app-network:
         ipv4_address: 173.17.0.8
@@ -93,10 +87,10 @@ services:
         "shard2",
         "--bind_ip_all",
         "--port",
-        "27017"
+        "27018"
       ]
     healthcheck:
-      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
